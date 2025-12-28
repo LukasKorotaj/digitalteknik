@@ -1,4 +1,4 @@
 # Ignore Quarto build related stuff
 /_extensions/
 /main_files/
-main.qmd
+main.html
