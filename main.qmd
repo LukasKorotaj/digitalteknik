@@ -108,8 +108,6 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
   * **Arithmetic Circuits:** Half/Full Adders, ALUs.
 * Relevant Sections:
   * **5.2.1 - 5.2.5:** Adders and ALUs
-  * **5.4.1:** Counters
-  * **5.4.2:** Shift Registers
 * Exercises:
   * **5.13**
   * **5.25**
@@ -534,5 +532,100 @@ What is the advantage of using the `logic` data type in SystemVerilog?
 1. [ ] It allows signals to be driven by multiple sources.
 1. [ ] It automatically initializes values to 0.
 1. [ ] It is only used for integer arithmetic.
+```
+:::
+
+# Standard Digital Modules
+To do addition we first build a *half adder*.
+
+::: {.callout-note}
+### A half-adder truth table.
+|A |B | $C_{out}$ | S
+| --- | --- | --- | --- |
+0       | 0     |0 | 0
+0 | 1| 0 | 1|
+1 | 0 | 0 | 1|
+1 | 1| 1 | 0|
+:::
+
+A *full-adder* accepts the $C_{out}$ as $C_{in}$. Where it acts as a term.
+
+![Schematic of a full adder.](./figures/fullAdder-1.png){fig-align="center" width=50%}
+
+The adder we build in lab 2 is called a *Ripple-Carry Adder*. In a Ripple-Carry adder we connect N full adders where one adders $C_{in}$ is the other ones $C_{out}$. An N bit Ripple-Carry adder consists of N full adders.
+
+The same works for subtraction! Remember that using two's complement one can subtract easily ($a - b = a + (-b)$).
+
+The *Arithmetic/Logical Unit* (ALU) combines a variety of mathematical and logical operations into a single unit. The ALU forms the heart of most computer systems.
+
+::: {.callout-tip collapse="true"}
+### Quiz: Stage 4
+
+```{quizdown}
+# Half Adder vs. Full Adder (single choice)
+
+What is the main difference between a Half Adder and a Full Adder?
+
+> Look at the inputs. A Full Adder is designed to be chained together, so it needs to handle the carry from the previous position.
+
+1. [ ] A Half Adder produces a Carry output, but a Full Adder does not.
+1. [ ] A Full Adder has two inputs (A, B), while a Half Adder has three.
+1. [x] A Full Adder has a Carry Input ($C_{in}$), while a Half Adder does not.
+1. [ ] A Half Adder is used for subtraction, while a Full Adder is used for addition.
+
+# Half Adder Logic (single choice)
+
+In a Half Adder, if the inputs are $A=1$ and $B=1$, what are the outputs?
+
+> Recall binary addition: $1 + 1 = 10_2$. The LSB is the Sum, the MSB is the Carry.
+
+1. [ ] Sum = 1, Carry = 0
+1. [ ] Sum = 1, Carry = 1
+1. [x] Sum = 0, Carry = 1
+1. [ ] Sum = 0, Carry = 0
+
+# Ripple-Carry Adder Construction (single choice)
+
+How many **Full Adders** are required to build an **N-bit** Ripple-Carry Adder?
+
+> Each bit position requires one adder to handle the bits $A_i$, $B_i$, and $C_{in}$.
+
+1. [ ] $N-1$
+1. [x] $N$
+1. [ ] $2N$
+1. [ ] $N/2$
+
+# Ripple-Carry Connections (single choice)
+
+In a Ripple-Carry Adder, how are the individual Full Adders connected?
+
+> The "Ripple" name comes from how the carry signal propagates through the chain.
+
+1. [ ] The Sum ($S$) of one adder connects to the Carry In ($C_{in}$) of the next.
+1. [ ] The Carry Out ($C_{out}$) of one adder connects to the Carry Out ($C_{out}$) of the next.
+1. [x] The Carry Out ($C_{out}$) of one adder connects to the Carry In ($C_{in}$) of the next.
+1. [ ] They are not connected; they operate in parallel.
+
+# Hardware Subtraction (single choice)
+
+How is subtraction ($A - B$) typically performed using standard adder hardware?
+
+> We use the property $A - B = A + (-B)$.
+
+1. [ ] By using a distinct "Full Subtractor" module instead of a Full Adder.
+1. [x] By adding A to the Two's Complement of B.
+1. [ ] By inverting A and adding it to B.
+1. [ ] By setting the Carry In ($C_{in}$) to 0.
+
+# ALU Definition (multiple choice)
+
+Which of the following statements accurately describe an **Arithmetic/Logic Unit (ALU)**?
+
+> The ALU is the "calculator" inside the CPU.
+
+- [x] It combines various mathematical (add, sub) and logical (AND, OR) operations into one unit.
+- [x] It forms the heart of most computer systems / processors.
+- [ ] It is a sequential circuit that stores memory.
+- [ ] It is primarily used to generate clock signals.
 ```
 :::
