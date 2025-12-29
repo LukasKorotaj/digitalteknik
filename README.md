@@ -1,7 +1,4 @@
----
-lang: en-US
----
-# Digital Design -- EITF65
+# Digital Design - EITF65
 
 This is the repo for the Quarto digitalteknik project, the *prepare-for-exam* guide.
 
