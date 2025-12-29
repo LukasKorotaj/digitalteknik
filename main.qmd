@@ -8,32 +8,37 @@ author:
   name: "Lukas Korotaj"
   email: "lu0026ko-s@student.lu.se"
 
-theme: darkly
+theme: 
+  - darkly
+  - custom.scss
 
 format:
   html:
+    highlight-style: dracula
+    code-appearance: true
     resource-path:
       - "figures"
     code-fold: true
+    code-annotations: hover
+    code-line-numbers: true
     toc: true
     toc-depth: 3
     toc-expand: true
     embed-resources: true
     self-contained-math: true
 
+jupyter: python3
+
+
 lang: en-US
 ---
 # Info
-Here is some information that would be nice to read before you start.
+Hello! My name is Lukas, I am a fellow student here in Lund. I recently discovered the program used to write this page (*Quarto*), so to test it out and to prepare for the exam I decided to write this page. If you have any questions or suggestions, please send them to my e-mail!
 
 ## General
-This is my attempt at making an interactive exam-preparation page. It assumes you are familiar with Digital Design and have done the labs, as the focus will be more on repetition than learning stuff from the beginning.
+This is my attempt at making an interactive exam-preparation page. It assumes you are familiar with Digital Design and have done the labs, as the focus will be more on repetition than learning from the beginning.
 
-I am going to summarize the chapters I reference in the books myself. The choice of chapters was based on what I think is important in the subject, the training exam, the labs and what Gemini thought I should know. That being said, I don't know what the exam will be like, so it is quite possible that I miss some important detail.
-
-::: {.callout-note}
-I know that having the physical copy of the book is allowed, but I don't want to rely on the fact that the book is next to me. It gives me a false sense of security.
-:::
+I am going to summarize the chapters I reference in the books myself. The choice of chapters was based on what I think is important in the subject, the training exam, the labs and some external sources. That being said, I don't know what the exam will be like, so it is quite possible that I miss some important detail.
 
 To complement this page, I will add some anki flashcards to the repo. I am not quite sure of the number of them right now, but knowing myself there will be quite a few.
 
@@ -48,7 +53,8 @@ In each stage I will be explaining the Concepts using the Relevant Sections. I w
 
 The exercises are the odd-numbered exercises for which solutions exist in the [book companion](https://pages.hmc.edu/harris/ddca/ddcarv.html) page on Canvas. I will not go through every relevant exercise as that would be too much work.
 
-### Stage 1: Core
+::: {.callout-note collapse="true"}
+### Stage 1: Core - Combinational Logic
 * Concepts:
   * **Two's Complement and Overflow**
   * **Logic Minimization with K-Maps**
@@ -60,12 +66,13 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 * Exercises:
   * **1.55, 1.61, 1.63**
   * **2.31, 2.33**
+:::
 
-### Stage 2: Sequential Logic & Timing Analysis
+::: {.callout-note collapse="true"}
+### Stage 2: Sequential Logic & Timing of Sequential Logic
 * Concepts:
   * **Latches & Flip-Flops**
-  * **Static Timing Analysis:** Calculating Max Frequency ($f_{max}$) and Setup Time
-  * **Hold Time Violations:** ($t_{hold} \leq t_{ccq} + t_{cd}$)
+  * **Static Timing Analysis**
   * **Clock Skew**
 * Relevant Sections:
   * **3.2.2 - 3.2.3:** Latches and Flip-Flops
@@ -73,7 +80,9 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 * Exercises:
   * **3.33**
   * **3.35, 3.37**
+:::
 
+::: {.callout-note collapse="true"}
 ### Stage 3: SystemVerilog
 * Concepts:
   * **Always Blocks**
@@ -89,7 +98,9 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
   * **4.15**
   * **4.27**
   * **4.33**
+:::
 
+::: {.callout-note collapse="true"}
 ### Stage 4: Standard Digital Modules
 * Concepts:
   * **Counters:** Up/Down counters, Gray code counters
@@ -102,10 +113,11 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 * Exercises:
   * **5.13**
   * **5.25**
+:::
 
 ---
 
-# Core
+# Core - Combinational Logic
 [*Two's Complement*](https://en.wikipedia.org/wiki/Two%27s_complement) is a way or representing *signed* binary numbers -- numbers that can also be negative. Two's complement numbers are negative when they have a 1 in the *Most Significant Bit* (MSB) position. Addition and subtraction works flawlessly with two's complement numbers. To do subtraction we can reverse the sign of one addend as $x-y$ is the same as $x+(-y)$. The sign of a two's complement is reversed by inverting all the bits and adding 1 to the *Least Significant Bit* (LSB) position. 
 
 For example, to convert $2$ to $-2$, we would first write $2$ in binary, $0010$, then reverse the bits, $1101$, and add one to LSB, $1110$. So $-2 = 1110$.
@@ -116,17 +128,15 @@ Adding two N-bit positive or negative numbers may cause overflow if the result i
 
 To extend the number of bits a two's complement number has, copy the sign bit into the MSB position that number of times. So, if we want to extend 4-bits to 7-bits we do like this: $3 = 0011 = 0000011$ and $-3 = 1101 = 1111101$.
 
-TODO: add example 1.14 to quiz.
-
 ---
 
 ::: {.callout-note}
 K-Maps take some practice to get used to. Therefore, instead of writing a whole essay about K-maps, I will link a great resource [here](https://learnabout-electronics.org/Digital/dig24.php) that explains how to solve K-maps in detail. I will just summarize the rules as a reminder.
 :::
 
-[Karnaugh Maps](https://en.wikipedia.org/wiki/Karnaugh_map) (K-Maps) are a graphical method for simplifying Boolean equations. They work great for up to four variables. With more variables, multiple K-maps are required. A K-map can look something like this:
+[Karnaugh Maps](https://en.wikipedia.org/wiki/Karnaugh_map) (K-Maps) are a graphical method for simplifying Boolean equations. They work great for up to four variables. With more variables, multiple K-maps are required.
 
-![](./figures/k-map.png){fig-align="center" width=50%}
+![Example of a K-map. Showing different examples of how to circle 1's.](./figures/k-map.png){fig-align="center" width=50%}
 
 The rules for finding a minimized equation using a K-map are:
 
@@ -146,20 +156,18 @@ Remember to label the axis in [Gray Code](https://www.geeksforgeeks.org/digital-
 
 *Delay* can be defined as the time to change in response to an input change. In *combinational logic* there are two types of delays, *propagation delay* and *contamination delay*. The propagation delay $t_{pd}$ is the maximum time from when any input changes until the output reaches its final value. The contamination delay $t_{cd}$ is the minimum time until any output starts to change its value. Basically, $t_{pd}$ is the time from start until everything is over and $t_{cd}$ is the time from start until something happens.
 
-![](./figures/delays.jpg){fig-align="center" width=50%}
-
-The figure above shows a timing diagram with $t_{pd}$ and $t_{cd}$ visualized, for a buffer.
+![This figure shows a timing diagram with $t_{pd}$ and $t_{cd}$ visualized, for a buffer.](./figures/delays.jpg){fig-align="center" width=50%}
 
 To find the propagation and contamination delay of a whole circuit we must consider the *critical path* and the *short path*. Simply put, the critical path is the longest path from any input to output, while the short path is the shortest path from any input to output.
 
-![](./figures/paths.jpg){fig-align="center" width=50%}
+![It's hard to see in the picture. But the Short Path is the gray one all the way down in the lower circuit.](./figures/paths.jpg){fig-align="center" width=50%}
 
 Propagation delay in a circuit is sum of propagation delays of each element on the critical path. Contamination delay is the sum of the contamination delays of each element on the short path.
 
 ---
 
-Quiz time!!!
-
+::: {.callout-tip collapse="true"}
+### Quiz: Stage 1
 ```{quizdown}
 # Two's Complement Conversion (single choice)
 
@@ -227,14 +235,304 @@ To calculate the **Propagation Delay** ($t_{pd}$) of an entire circuit, which pa
 1. [ ] The Average Path
 1. [ ] The Clock Path
 ```
+:::
 
-# Sequential Logic & Timing Analysis
+# Sequential Logic & Timing of Sequential Logic
 Before I get to the latches and flip-flops we first need to understand what *Sequential Logic* is. The crucial difference between combinational and sequential logic is that sequential logic has *memory*. The outputs of sequential logic depend both on the current and past inputs.
 
 A *D-latch* has two inputs, the *data* input, D, and the *clock*, CLK. When CLK is 1 the latch acts as a buffer, just passing through D. But when CLK is 0 the latch remembers its old value, and the output Q does not change. A *Flip-Flop* is simply two connected latches that solve a specific problem.
+
+![A D-latch, the SR latch can be build using NOR or NAND gates. Depends on if the system is active high or low. This one is Active Low.](./figures/dlatch.png){fig-align="center" width=50%}
 
 As latches are *level-triggered* they output values as long as the clock is high or low. This isn't ideal as it allows for races in a circuit. Flip-Flops are *edge-triggered* which means they output data only when the CLK is on *rising-edge*. The book highlights this: *A D flip-flop copies D to Q on the rising edge of the clock and remembers its state at all other times.*
 
 ---
 
 A flip-flop copies the input to the output on the rising edge of the clock. But what happens if the edge rises at the same time the input changes?
+
+For sequential logic we use the clock-to-Q propagation delay $t_{pcq}$ and clock-to-Q contamination delay $t_{ccq}$. To understand the difference between $t_{pcq}$ and $t_{pd}$ think of the $t_{pcq}$ as the time needed for the flip-flop to output valid data (Q) after the rising clock edge hits it and the $t_{pd}$ as the time it takes for the signal to travel through logic gates between two flip-flops. The same goes for $t_{ccq}$ and $t_{cd}$.
+
+For the outputs to be correct, the inputs need to be stable for some time, $t_{\text{setup}}$, before the rising edge of the clock. And must remain stable for some time after the rising edge of the clock, $t_{\text{hold}}$. 
+
+$T_c$ is the *clock period*, the time between the rising edges of the clock. $f_c = 1/T_c$ is the *clock frequency*, measured in Hertz. The formula for finding the minimum clock period is as follows:
+
+$$
+T_c \geq t_{pcq} + t_{pd} + t_{\text{setup}}
+$$
+For tasks where *clock skew*, the variation in clock edges, is relevant, it is also required to add the $t_{\text{skew}}$ to the formula.
+
+$$
+T_c \geq t_{pcq} + t_{pd} + t_{\text{setup}} + t_{\text{skew}}
+$$
+
+$t_{\text{hold}}$ is usually irrelevant, the book ignores it but mentions the formula.
+
+$$
+t_{ccq} + t_{cd} \geq t_{\text{hold}} + t_{\text{skew}}
+$$
+
+::: {.callout-tip collapse="true"}
+### Quiz: Stage 2
+```{quizdown}
+# Latch vs. Flip-Flop (single choice)
+
+What is the fundamental difference between a D-Latch and a D-Flip-Flop?
+
+> Latches are transparent while the clock is at a specific level (high or low). Flip-flops only update on an edge (rising or falling).
+
+1. [ ] Latches have memory, Flip-Flops do not.
+1. [ ] Latches update on the rising edge of the clock; Flip-Flops update when the clock is high.
+1. [x] Latches are level-triggered; Flip-Flops are edge-triggered.
+1. [ ] Flip-Flops are used for combinational logic; Latches are used for sequential logic.
+
+# Setup Time Definition (single choice)
+
+What does **Setup Time** ($t_{setup}$) represent?
+
+> It is the "head start" the data needs before the clock snaps the picture.
+
+1. [ ] The time the output must remain stable after the rising edge of the clock.
+1. [x] The time the input must be stable *before* the rising edge of the clock.
+1. [ ] The time it takes for the flip-flop to copy D to Q.
+1. [ ] The minimum clock period allowed.
+
+# Calculating Maximum Frequency (multiple choice)
+
+Which of the following components are included when calculating the **minimum clock period** ($T_c$) required to avoid setup violations?
+
+> $T_c \geq t_{pcq} + t_{pd} + t_{setup} + t_{skew}$. Note that $t_{hold}$ is NOT part of this equation (it relates to the short path, not the period).
+
+- [x] Propagation Delay of Logic ($t_{pd}$)
+- [x] Clock-to-Q Delay ($t_{pcq}$)
+- [x] Setup Time ($t_{setup}$)
+- [ ] Hold Time ($t_{hold}$)
+
+# Clock Skew and Performance (single choice)
+
+How does **Clock Skew** ($t_{skew}$) affect the maximum operating frequency of a circuit?
+
+> Skew adds uncertainty. You have to wait longer ($T_c$ increases) to be safe, which means the frequency ($f = 1/T_c$) decreases.
+
+1. [ ] It increases the maximum frequency (makes it faster).
+1. [x] It decreases the maximum frequency (makes it slower).
+1. [ ] It has no effect on frequency, only on hold time.
+1. [ ] It improves the setup time margin.
+
+# Hold Time Constraint (single choice)
+
+Which inequality correctly represents the condition to prevent a **Hold Time Violation**?
+
+> The fastest signal ($t_{ccq} + t_{cd}$) must be slower (arrive later) than the time the next flip-flop stops listening ($t_{hold}$).
+
+1. [ ] $t_{pcq} + t_{pd} \geq t_{setup}$
+1. [ ] $t_{ccq} + t_{cd} \leq t_{hold}$
+1. [x] $t_{ccq} + t_{cd} \geq t_{hold}$
+1. [ ] $t_{pd} + t_{setup} \geq t_{ccq}$
+
+# Fixing Timing Violations (single choice)
+
+If you have a **Setup Time Violation** (the circuit is too slow), what is the easiest way to fix it without changing the hardware?
+
+> Setup violations depend on the clock period $T_c$. Increasing $T_c$ (slowing down the clock) gives the signal more time to arrive. Hold violations cannot be fixed this way because they are independent of the cycle time.
+
+1. [ ] Decrease the clock period (increase frequency).
+1. [x] Increase the clock period (decrease frequency).
+1. [ ] Decrease the supply voltage.
+1. [ ] You cannot fix it without changing the logic gates.
+```
+:::
+
+# SystemVerilog
+Since there is a lot of SystemVerilog syntax, and this is just repetition, I decided to add this interactive code block. You can hover over the circled numbers on the side to get the explanation of different parts of code. I assume you know the basics of SystemVerilog syntax.
+
+This specific FSM outputs HIGH if the sequence of inputs is 1 and then 0.
+
+```systemverilog
+module sequence_detector (
+    input  logic clk, reset,
+    input  logic in,
+    output logic out
+);
+
+    typedef enum logic [1:0] {S0, S1, S2} state_t; # <1>
+    state_t current_state, next_state;             # <1>
+
+    // 1. State Register (Sequential Logic)
+    always_ff @(posedge clk, posedge reset) begin  # <2>
+        if (reset)                                 # <3>
+            current_state <= S0;                   # <3>
+        else                                       # <4>
+            current_state <= next_state;           # <4>
+    end
+
+    // 2. Next State Logic (Combinational Logic)
+    always_comb begin                              # <5>
+        case (current_state)                       # <6>
+            S0: if (in) next_state = S1;           # <7>
+                else    next_state = S0;           # <7>
+
+            S1: if (in) next_state = S1;
+                else    next_state = S2;           # <7>
+
+            S2: if (in) next_state = S1;
+                else    next_state = S0;
+
+            default: next_state = S0;              # <8>
+        endcase
+    end
+
+    // 3. Output Logic (Moore: Depends only on state)
+    assign out = (current_state == S2);            # <9>
+
+endmodule
+```
+
+1. Define the states using `enum`. This makes the code readable (using names like `S0`) while SystemVerilog handles the binary numbering (`00`, `01`, `10`) behind the scenes.
+2. `always_ff` (ff stands for flip-flop) indicates **Sequential Logic**. It triggers on the rising edge of the clock (`posedge clk`) or reset.
+3. **Asynchronous Reset:** If the reset signal goes high, the system immediately forces the state back to `S0`, ignoring the clock. The reset would be *synchronous* if the `posedge reset` wasn't there.
+4. **State Update:** On every clock cycle (if not resetting), we update the `current_state` to whatever the `next_state` logic calculated. Note the use of **Non-Blocking Assignment** (`<=`) here, which is required for sequential logic.
+5. `always_comb` indicates **Combinational Logic**. This block acts like a cloud of logic gates that instantly calculates the *next* move.
+6. The `case` statement is the standard way to describe FSM transitions.
+7. The logic: "If I am in `S0` and input `in` is 1, go to `S1`."
+8. **Default case:** Good practice (and often required) to ensure that if the machine somehow reaches an undefined state, it resets safely rather than getting stuck.
+9. **Moore Output:** The output is high *only* if we are in state `S2`. Since it does not depend on `in` (only `current_state`), it is a Moore machine.
+
+::: {.callout-note}
+The code block above has *module specifications*
+
+```systemverilog
+module module_name (
+  input logic ...,
+  output logic ...
+);
+...
+endmodule
+```
+We did not need to do this in IceStudio, as it generates the module specifications for us. But in real SystemVerilog the specifications are required.
+
+If you wish a bit more detailed syntax guide you can look at [this cheat sheet](https://www.cl.cam.ac.uk/teaching/1011/ECAD+Arch/files/SystemVerilogCheatSheet.pdf).
+:::
+
+![Graph of the FSM above](./figures/graph.svg)
+
+
+Another code block showing additional syntax features of SystemVerilog.
+
+```systemverilog
+
+logic [1:0] raw_id;                  # <1>
+
+// 1. Ternary Operator (Conditional Assignment)
+assign valid = enable ? (|irq) : 1'b0; # <2>
+
+// 2. Combinational Logic with casez
+always_comb begin                    
+    casez (irq)                      # <3>
+        4'b1???: raw_id = 2'd3;      # <4>
+        4'b01??: raw_id = 2'd2;      # <4>
+        4'b001?: raw_id = 2'd1;      # <4>
+        4'b0001: raw_id = 2'd0;      # <5>
+        default: raw_id = 2'd0;
+    endcase
+end
+
+assign id = valid ? raw_id : 2'b00;
+```
+
+1. **`logic` type:** In SystemVerilog, we use `logic` for almost everything. It replaces `reg` vs `wire` distinction from Verilog.
+2. **`condition ? true_val : false_val`**: This is the **Ternary Operator**. It is a one-line if-else. Here, it says: "If `enable` is high, check if any interrupt bit is set; otherwise, output 0."
+3. **`casez`**: A special version of `case` that allows "Don't Care" bits. It is essential for priority logic where you care about the highest bit but ignore the lower ones.
+4. **`?` (Don't Care):** In a `casez` statement, `?` (or `z`) means "I don't care if this bit is 0 or 1."
+
+5. **Specific Match:** You can mix precise bits with don't cares.
+
+::: {.callout-note}
+More about **reduction operators**: In the code example above you saw, `|irq` is a reduction operator. It basically performs the operator on all the bits in a vector, converting the answer to a single bit. In other words, if any bit in `irq` is HIGH the output is HIGH, as the operator performs OR on all bits.
+
+|Operator       | Type  |
+| ---           | ---   |
+|&              | And   |
+|~&             | Nand  |
+|\|             | Or    |
+|~\|            | Nor   |
+|^              | Xor   |
+|~^             | Xnor  |
+:::
+
+::: {.callout-tip collapse="true"}
+### Quiz: Stage 3
+```{quizdown}
+# Synchronous vs. Asynchronous Reset (single choice)
+
+How would you modify the following code to make the **Reset Synchronous** (so it waits for the clock edge)?
+
+~~~systemverilog
+always_ff @(posedge clk, posedge reset) begin
+    if (reset) current_state <= S0;
+    else       current_state <= next_state;
+end
+~~~
+
+> Currently, `posedge reset` in the sensitivity list makes it Asynchronous.
+
+1. [ ] Change `posedge reset` to `negedge reset`.
+1. [ ] Remove `if (reset)` and just use `else`.
+1. [x] Remove `posedge reset` from the sensitivity list `@(...)`.
+1. [ ] Change `always_ff` to `always_comb`.
+
+# Assignment Operators (single choice)
+
+Why do we use the **Non-Blocking Assignment** (`<=`) inside the `always_ff` block?
+
+> `always_ff` models sequential logic (flip-flops).
+
+1. [ ] It is faster than blocking assignment.
+1. [ ] It allows the reset to work asynchronously.
+1. [x] It ensures all flip-flops update concurrently (at the same time) after the clock edge.
+1. [ ] It is required for combinational logic.
+
+# Reduction Operators (multiple choice)
+
+If `logic [3:0] data = 4'b1010;`, what are the results of the following reduction operations?
+
+> `|` is OR (is *any* bit 1?). `&` is AND (are *all* bits 1?).
+
+- [x] `|data` evaluates to `1` (True).
+- [ ] `&data` evaluates to `1` (True).
+- [x] `&data` evaluates to `0` (False).
+- [ ] `^data` (XOR) evaluates to `1` (Odd parity).
+
+# Casez and Don't Cares (single choice)
+
+In a `casez` statement, which of the following binary values will **match** the case item `4'b10??`?
+
+> `?` means "ignore this bit". So we only care that bit 3 is `1` and bit 2 is `0`.
+
+1. [ ] `0011`
+1. [ ] `1100`
+1. [x] `1001`
+1. [ ] `0111`
+
+# Moore vs. Mealy Code (single choice)
+
+Which line of code confirms that the FSM example provided is a **Moore Machine**?
+
+> Moore outputs depend *only* on the current state. Mealy outputs depend on the current state *and* the input.
+
+1. [ ] `always_ff @(posedge clk, posedge reset)`
+1. [ ] `if (in) next_state = S1;`
+1. [x] `assign out = (current_state == S2);`
+1. [ ] `typedef enum logic [1:0] {S0, S1, S2} state_t;`
+
+# SystemVerilog Logic Type (single choice)
+
+What is the advantage of using the `logic` data type in SystemVerilog?
+
+> In older Verilog, you had to strictly choose between `reg` (for always blocks) and `wire` (for assign statements). `logic` handles both.
+
+1. [x] It effectively replaces both `reg` and `wire`, preventing confusion.
+1. [ ] It allows signals to be driven by multiple sources.
+1. [ ] It automatically initializes values to 0.
+1. [ ] It is only used for integer arithmetic.
+```
+:::
