@@ -103,11 +103,11 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 ::: {.callout-note collapse="true"}
 ### Stage 4: Standard Digital Modules
 * Concepts:
-  * **Counters:** Up/Down counters, Gray code counters
-  * **Shift Registers**
+  * **Finite State Machines (FSMs)**
   * **Arithmetic Circuits:** Half/Full Adders, ALUs.
 * Relevant Sections:
-  * **5.2.1 - 5.2.5:** Adders and ALUs
+  * **3.4.6:** FSM Review
+  * **5.2.1 - 5.2.4:** Adders and ALUs
 * Exercises:
   * **5.13**
   * **5.25**
@@ -536,19 +536,85 @@ What is the advantage of using the `logic` data type in SystemVerilog?
 :::
 
 # Standard Digital Modules
+**Finite State Machines** are a great way to design sequential circuits from a specification. We designed multiple FSMs during the different labs. There are two types of FSMs, **Moore** and **Mealy**. Moore machines output depends only on the current state while Mealy depends on the state **and** the input. If you get to choose, a Moore machine is more stable and generally simpler, and a Mealy machine is more responsive and has fewer states.
+
+The book has a section explaining FSMs, but you can also use [this](https://www.allaboutcircuits.com/textbook/digital/chpt-11/finite-state-machines/) resource if you want to read online.
+
+To design an FSM follow these steps:
+
+* Map the inputs and outputs.
+* Sketch a state transition diagram.
+
+![State Transition Diagram (Moore)](./figures/state-diagram-circuit.jpg){fig-align="center" width=50%}
+
+* Write a state transition and output table.
+
+![State transition and output table (Moore)](./figures/state-table.jpg){fig-align="center" width=50%}
+
+![State transition and output table with a diagram (Mealy)](./figures/state-table-mealy.png){fig-align="center" width=50%}
+
+* Select the state encodings. That means you convert the state names (S1, S0,...) to binary.
+
+* Write Boolean equations for the next state and output logic. Perhaps using K-maps.
+
+* Sketch the circuit.
+
+* To implement an FSM in SystemVerilog, divide the FSM into three parts.
+  * State register (`always_ff`).
+  * Next state logic (combinational).
+  * Output logic (combinational).
+
+::: {.callout-note}
+### SystemVerilog implementation of a Moore FSM (Example from the book).
+```systemverilog
+module patternMoore (
+    input  logic clk,
+    input  logic reset,
+    input  logic a,
+    output logic y
+);
+  typedef enum logic [1:0] {
+    S0,
+    S1,
+    S2
+  } statetype;
+  statetype state, nextstate;
+  // state register
+  always_ff @(posedge clk, posedge reset)
+    if (reset) state <= S0;
+    else state <= nextstate;
+  // next state logic
+  always_comb
+    case (state)
+      S0:      if (a) nextstate = S0;
+ else nextstate = S1;
+      S1:      if (a) nextstate = S2;
+ else nextstate = S1;
+      S2:      if (a) nextstate = S0;
+ else nextstate = S1;
+      default: nextstate = S0;
+    endcase
+  // output logic
+  assign y = (state == S2);
+endmodule
+```
+:::
+
+---
+
 To do addition we first build a *half adder*.
 
 ::: {.callout-note}
 ### A half-adder truth table.
-|A |B | $C_{out}$ | S
-| --- | --- | --- | --- |
-0       | 0     |0 | 0
-0 | 1| 0 | 1|
-1 | 0 | 0 | 1|
-1 | 1| 1 | 0|
+|A      |B      | $C_{out}$     | S     |
+| ---   | ---   | ---           | ---   |
+|0      | 0     | 0             | 0     |
+|0      | 1     | 0             | 1     |
+|1      | 0     | 0             | 1     |
+|1      | 1     | 1             | 0     |
 :::
 
-A *full-adder* accepts the $C_{out}$ as $C_{in}$. Where it acts as a term.
+A *full-adder* is a half-adder that accepts the $C_{out}$ as $C_{in}$. Where it acts as a term.
 
 ![Schematic of a full adder.](./figures/fullAdder-1.png){fig-align="center" width=50%}
 
@@ -562,70 +628,69 @@ The *Arithmetic/Logical Unit* (ALU) combines a variety of mathematical and logic
 ### Quiz: Stage 4
 
 ```{quizdown}
+# Moore vs. Mealy Outputs (single choice)
+
+What determines the output of a **Moore** Finite State Machine?
+
+> A Moore machine is considered "safer" because its output is decoupled from the immediate changes in input signals.
+
+1. [ ] The current state and the current inputs.
+1. [x] Only the current state.
+1. [ ] The previous state and the clock edge.
+1. [ ] Only the current inputs.
+
+# FSM Characteristics (single choice)
+
+Which of the following advantages is associated with a **Mealy** machine compared to a Moore machine?
+
+> Mealy machines look at inputs immediately, allowing them to react within the same clock cycle, often resulting in fewer required states.
+
+1. [ ] It is generally more stable.
+1. [ ] It is easier to implement in software.
+1. [x] It is more responsive and often requires fewer states.
+1. [ ] Its outputs are always synchronized with the clock.
+
+# SystemVerilog FSM Structure (sequence)
+
+When implementing an FSM in SystemVerilog, which order of logic blocks corresponds to the standard three-part design pattern?
+
+> 1. Memory (Register) 2. Decision Making (Next State) 3. Translation (Output).
+
+1. State Register (`always_ff`)
+2. Next State Logic (`always_comb`)
+3. Output Logic (`assign` or `always_comb`)
+
 # Half Adder vs. Full Adder (single choice)
 
-What is the main difference between a Half Adder and a Full Adder?
+Why can't we build a multi-bit adder using **only** Half Adders?
 
-> Look at the inputs. A Full Adder is designed to be chained together, so it needs to handle the carry from the previous position.
+> To chain adders together, each position needs to know if the previous position generated a carry.
 
-1. [ ] A Half Adder produces a Carry output, but a Full Adder does not.
-1. [ ] A Full Adder has two inputs (A, B), while a Half Adder has three.
-1. [x] A Full Adder has a Carry Input ($C_{in}$), while a Half Adder does not.
-1. [ ] A Half Adder is used for subtraction, while a Full Adder is used for addition.
+1. [ ] Half Adders cannot perform binary addition.
+1. [ ] Half Adders do not generate a Carry Out ($C_{out}$).
+1. [x] Half Adders do not accept a Carry In ($C_{in}$).
+1. [ ] Half Adders are too slow.
 
-# Half Adder Logic (single choice)
+# Ripple-Carry Adder Connections (single choice)
 
-In a Half Adder, if the inputs are $A=1$ and $B=1$, what are the outputs?
+In an N-bit Ripple-Carry Adder, how are the Full Adders connected to each other?
 
-> Recall binary addition: $1 + 1 = 10_2$. The LSB is the Sum, the MSB is the Carry.
+> The "Ripple" effect refers to the carry bit passing from the Least Significant Bit (LSB) up to the Most Significant Bit (MSB).
 
-1. [ ] Sum = 1, Carry = 0
-1. [ ] Sum = 1, Carry = 1
-1. [x] Sum = 0, Carry = 1
-1. [ ] Sum = 0, Carry = 0
-
-# Ripple-Carry Adder Construction (single choice)
-
-How many **Full Adders** are required to build an **N-bit** Ripple-Carry Adder?
-
-> Each bit position requires one adder to handle the bits $A_i$, $B_i$, and $C_{in}$.
-
-1. [ ] $N-1$
-1. [x] $N$
-1. [ ] $2N$
-1. [ ] $N/2$
-
-# Ripple-Carry Connections (single choice)
-
-In a Ripple-Carry Adder, how are the individual Full Adders connected?
-
-> The "Ripple" name comes from how the carry signal propagates through the chain.
-
-1. [ ] The Sum ($S$) of one adder connects to the Carry In ($C_{in}$) of the next.
-1. [ ] The Carry Out ($C_{out}$) of one adder connects to the Carry Out ($C_{out}$) of the next.
+1. [ ] All Carry Inputs ($C_{in}$) are connected to the clock.
 1. [x] The Carry Out ($C_{out}$) of one adder connects to the Carry In ($C_{in}$) of the next.
-1. [ ] They are not connected; they operate in parallel.
+1. [ ] The Sum ($S$) of one adder connects to the Carry In ($C_{in}$) of the next.
+1. [ ] They are not connected; they calculate in parallel.
 
-# Hardware Subtraction (single choice)
+# FSM State Encoding (single choice)
 
-How is subtraction ($A - B$) typically performed using standard adder hardware?
+What does the step "Select the state encodings" refer to in the FSM design process?
 
-> We use the property $A - B = A + (-B)$.
+> FSMs are abstract concepts with names like S0, S1. Hardware only understands 0s and 1s.
 
-1. [ ] By using a distinct "Full Subtractor" module instead of a Full Adder.
-1. [x] By adding A to the Two's Complement of B.
-1. [ ] By inverting A and adding it to B.
-1. [ ] By setting the Carry In ($C_{in}$) to 0.
-
-# ALU Definition (multiple choice)
-
-Which of the following statements accurately describe an **Arithmetic/Logic Unit (ALU)**?
-
-> The ALU is the "calculator" inside the CPU.
-
-- [x] It combines various mathematical (add, sub) and logical (AND, OR) operations into one unit.
-- [x] It forms the heart of most computer systems / processors.
-- [ ] It is a sequential circuit that stores memory.
-- [ ] It is primarily used to generate clock signals.
+1. [ ] Drawing the state transition diagram.
+1. [ ] Assigning inputs to specific pins on the FPGA.
+1. [x] Converting abstract state names (e.g., S0, S1) into binary values.
+1. [ ] Writing the SystemVerilog `always_ff` block.
 ```
 :::
