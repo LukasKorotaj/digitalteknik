@@ -24,6 +24,7 @@ format:
     toc: true
     toc-depth: 3
     toc-expand: true
+    toc-location: body
     embed-resources: true
     self-contained-math: true
 
@@ -33,19 +34,17 @@ jupyter: python3
 lang: en-US
 ---
 # Info
-Hello! My name is Lukas, I am a fellow student here in Lund. I recently discovered the program used to write this page (*Quarto*), so to test it out and to prepare for the exam I decided to write this page. If you have any questions or suggestions, please send them to my e-mail!
+Hello and welcome! I decided to write this page as a way to study for the upcoming exam. If you have any questions or suggestions, send them to my e-mail!
 
 ## General
 This is my attempt at making an interactive exam-preparation page. It assumes you are familiar with Digital Design and have done the labs, as the focus will be more on repetition than learning from the beginning.
 
 I am going to summarize the chapters I reference in the books myself. The choice of chapters was based on what I think is important in the subject, the training exam, the labs and some external sources. That being said, I don't know what the exam will be like, so it is quite possible that I miss some important detail.
 
-To complement this page, I will add some anki flashcards to the repo. I am not quite sure of the number of them right now, but knowing myself there will be quite a few.
-
 Self-testing is important, so to aid with that I will add some quizzes at the end of each theory section.
 
 ## Stages
-Let's get to the meat now. There will be four "stages". The stages have no deeper meaning, they are just there to divide the content a little. I reward myself with a cookie after each completed stage.
+Let's get started! There will be four "stages". The stages have no deeper meaning, they are just there to divide the content a little. I reward myself with a cookie after each completed stage.
 
 Each stage has *Concepts* and a *Quiz*.
 
@@ -58,6 +57,7 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 * Concepts:
   * **Two's Complement and Overflow**
   * **Logic Minimization with K-Maps**
+  * **Gray Codes**
   * **Timing** (Propagation delay and contamination delay, $t_{pd}$ and $t_{cd}$)
 * Relevant Sections:
   * **1.4.6** Signed Binary Numbers
@@ -116,23 +116,33 @@ The exercises are the odd-numbered exercises for which solutions exist in the [b
 ---
 
 # Core - Combinational Logic
+
+## Two's Complement
 [*Two's Complement*](https://en.wikipedia.org/wiki/Two%27s_complement) is a way or representing *signed* binary numbers -- numbers that can also be negative. Two's complement numbers are negative when they have a 1 in the *Most Significant Bit* (MSB) position. Addition and subtraction works flawlessly with two's complement numbers. To do subtraction we can reverse the sign of one addend as $x-y$ is the same as $x+(-y)$. The sign of a two's complement is reversed by inverting all the bits and adding 1 to the *Least Significant Bit* (LSB) position. 
 
 For example, to convert $2$ to $-2$, we would first write $2$ in binary, $0010$, then reverse the bits, $1101$, and add one to LSB, $1110$. So $-2 = 1110$.
 
 The range of two's complement is $\left[ -2^{N-1},\ 2^{N-1} -1 \right]$, where $N$ is the number of bits.
 
-Adding two N-bit positive or negative numbers may cause overflow if the result is greater than $2^{N-1} -1$ or lower than $2^{N-1}$. Overflow occurs if the two numbers being added have the same sign bit and the result has the opposite sign bit!
+Adding two N-bit positive or negative numbers may cause **overflow** if the result is greater than $2^{N-1} -1$ or lower than $2^{N-1}$. Overflow occurs if the two numbers being added have the same sign bit and the result has the opposite sign bit!
+
+::: {.callout-note}
+Overflow is when the result of an arithmetic operation exceeds the range that the specified number of bits can represent.
+:::
 
 To extend the number of bits a two's complement number has, copy the sign bit into the MSB position that number of times. So, if we want to extend 4-bits to 7-bits we do like this: $3 = 0011 = 0000011$ and $-3 = 1101 = 1111101$.
 
----
-
+## K-Maps
 ::: {.callout-note}
 K-Maps take some practice to get used to. Therefore, instead of writing a whole essay about K-maps, I will link a great resource [here](https://learnabout-electronics.org/Digital/dig24.php) that explains how to solve K-maps in detail. I will just summarize the rules as a reminder.
 :::
 
 [Karnaugh Maps](https://en.wikipedia.org/wiki/Karnaugh_map) (K-Maps) are a graphical method for simplifying Boolean equations. They work great for up to four variables. With more variables, multiple K-maps are required.
+
+::: {.callout-tip}
+### Another Boolean minimization rule
+Remember that `~AB + A~B = A ^ B` and `~A~B + AB = ~(A ^ B)`!
+:::
 
 ![Example of a K-map. Showing different examples of how to circle 1's.](./figures/k-map.png){fig-align="center" width=50%}
 
@@ -147,11 +157,32 @@ The rules for finding a minimized equation using a K-map are:
 * Additional rule for *Don't Cares*: They do not need to be circled if they are not helpful.
 
 ::: {.callout-warning}
-Remember to label the axis in [Gray Code](https://www.geeksforgeeks.org/digital-logic/what-is-gray-code/)!
+Remember to label the axis in *Gray Code*!
 :::
 
----
+## Gray Code
 
+[*Gray Code*](https://en.wikipedia.org/wiki/Gray_code) is an ordering of the binary system such that two successive values differ in only one bit. In practice, Gray code is used to reduce errors in different systems.
+
+Guide to converting binary code to Gray code:
+
+* The Most Significant Bit is the same.
+* Go from left to right.
+* Other bits of the Gray code are equal to the XOR of the bit of the same and previous index of the binary code.
+
+![Binary code to Gray code](./figures/binary-to-gray.png){fig-align="center" width=50%}
+
+To convert Gray code to binary:
+
+* Copy the Most Significant Bit.
+* The next binary number is the XOR of the previous binary number and the Gray code number at the same index.
+
+![Gray code to binary code](./figures/gray-to-binary.png){fig-align="center" width=50%}
+
+
+
+
+## Delay Basics
 *Delay* can be defined as the time to change in response to an input change. In *combinational logic* there are two types of delays, *propagation delay* and *contamination delay*. The propagation delay $t_{pd}$ is the maximum time from when any input changes until the output reaches its final value. The contamination delay $t_{cd}$ is the minimum time until any output starts to change its value. Basically, $t_{pd}$ is the time from start until everything is over and $t_{cd}$ is the time from start until something happens.
 
 ![This figure shows a timing diagram with $t_{pd}$ and $t_{cd}$ visualized, for a buffer.](./figures/delays.jpg){fig-align="center" width=50%}
@@ -161,8 +192,6 @@ To find the propagation and contamination delay of a whole circuit we must consi
 ![It's hard to see in the picture. But the Short Path is the gray one all the way down in the lower circuit.](./figures/paths.jpg){fig-align="center" width=50%}
 
 Propagation delay in a circuit is sum of propagation delays of each element on the critical path. Contamination delay is the sum of the contamination delays of each element on the short path.
-
----
 
 ::: {.callout-tip collapse="true"}
 ### Quiz: Stage 1
@@ -238,13 +267,15 @@ To calculate the **Propagation Delay** ($t_{pd}$) of an entire circuit, which pa
 # Sequential Logic & Timing of Sequential Logic
 Before I get to the latches and flip-flops we first need to understand what *Sequential Logic* is. The crucial difference between combinational and sequential logic is that sequential logic has *memory*. The outputs of sequential logic depend both on the current and past inputs.
 
+## D-Latches and Flip-Flops
+
 A *D-latch* has two inputs, the *data* input, D, and the *clock*, CLK. When CLK is 1 the latch acts as a buffer, just passing through D. But when CLK is 0 the latch remembers its old value, and the output Q does not change. A *Flip-Flop* is simply two connected latches that solve a specific problem.
 
 ![A D-latch, the SR latch can be build using NOR or NAND gates. Depends on if the system is active high or low. This one is Active Low.](./figures/dlatch.png){fig-align="center" width=50%}
 
 As latches are *level-triggered* they output values as long as the clock is high or low. This isn't ideal as it allows for races in a circuit. Flip-Flops are *edge-triggered* which means they output data only when the CLK is on *rising-edge*. The book highlights this: *A D flip-flop copies D to Q on the rising edge of the clock and remembers its state at all other times.*
 
----
+## Timing
 
 A flip-flop copies the input to the output on the rising edge of the clock. But what happens if the edge rises at the same time the input changes?
 
@@ -536,6 +567,8 @@ What is the advantage of using the `logic` data type in SystemVerilog?
 :::
 
 # Standard Digital Modules
+
+## Finite State Machines
 **Finite State Machines** are a great way to design sequential circuits from a specification. We designed multiple FSMs during the different labs. There are two types of FSMs, **Moore** and **Mealy**. Moore machines output depends only on the current state while Mealy depends on the state **and** the input. If you get to choose, a Moore machine is more stable and generally simpler, and a Mealy machine is more responsive and has fewer states.
 
 The book has a section explaining FSMs, but you can also use [this](https://www.allaboutcircuits.com/textbook/digital/chpt-11/finite-state-machines/) resource if you want to read online.
@@ -600,8 +633,7 @@ endmodule
 ```
 :::
 
----
-
+## Half Adder
 To do addition we first build a *half adder*.
 
 ::: {.callout-note}
@@ -614,14 +646,22 @@ To do addition we first build a *half adder*.
 |1      | 1     | 1             | 0     |
 :::
 
+## Full Adder
 A *full-adder* is a half-adder that accepts the $C_{out}$ as $C_{in}$. Where it acts as a term.
 
 ![Schematic of a full adder.](./figures/fullAdder-1.png){fig-align="center" width=50%}
 
+## Ripple-Carry Adder
 The adder we build in lab 2 is called a *Ripple-Carry Adder*. In a Ripple-Carry adder we connect N full adders where one adders $C_{in}$ is the other ones $C_{out}$. An N bit Ripple-Carry adder consists of N full adders.
 
 The same works for subtraction! Remember that using two's complement one can subtract easily ($a - b = a + (-b)$).
 
+::: {.callout-note}
+### A Note on Overflow
+If calculating unsigned numbers, if the Most Significant Bit has $C_{out} = 1$ then it indicates overflow. However, for signed number $C_{out} = 1$ does **not** indicate overflow. Remember that overflow in two's complement number happens when both addends have the same sign and the result has the opposite sign, `Overflow = C_inMSB ^ C_outMSB`
+:::
+
+## Arithmetic/Logical Unit
 The *Arithmetic/Logical Unit* (ALU) combines a variety of mathematical and logical operations into a single unit. The ALU forms the heart of most computer systems.
 
 ::: {.callout-tip collapse="true"}
@@ -694,3 +734,12 @@ What does the step "Select the state encodings" refer to in the FSM design proce
 1. [ ] Writing the SystemVerilog `always_ff` block.
 ```
 :::
+
+---
+
+# Conclusion
+This page is a small part of all the theory covered in the book. For example, I haven't talked at all about the RISC-V architecture, which was a big part of the labs. Again this is just meant to be repetition before the exam, not a whole book summary.
+
+Another thing I want to mention. I did not include any logic gate symbol- and SystemVerilog syntax explanations. Like, for example, all the characters used to write Boolean logic. These are easy to find in the book and if I wanted to cover everything to that depth this page would be a lot bigger.
+
+Hope you learned something or at least refreshed your knowledge reading this!
