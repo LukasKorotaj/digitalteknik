@@ -1,4 +1,5 @@
 # Ignore Quarto build related stuff
 /_extensions/
 /main_files/
+/builds/
 main.html
